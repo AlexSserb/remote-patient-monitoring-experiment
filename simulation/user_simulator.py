@@ -27,19 +27,27 @@ class UserSimulator:
     def __init__(self, profile: UserProfile) -> None:
         self.profile = profile
 
-    def simulate_day(self, notification_time: float, weekday: int, day_index: int) -> DayResult:
+    def simulate_day(
+        self,
+        notification_time: float,
+        weekday: int,
+        day_index: int,
+        run_seed: int = 0,
+    ) -> DayResult:
         """
         Симулирует один день эксперимента.
 
         notification_time: час отправки уведомления (8.0–21.0)
         weekday:           день недели (0=Пн, 6=Вс)
         day_index:         номер дня в эксперименте (0–179)
+        run_seed:          номер прогона; разные значения дают независимые реализации
+                           случайного поведения при одинаковом профиле и алгоритме.
 
-        RNG привязан к (profile.seed, day_index), поэтому результат зависит только
-        от профиля и дня, но не от истории выборов алгоритма. Это гарантирует
+        RNG привязан к (profile.seed, run_seed, day_index): результат зависит только
+        от профиля, прогона и дня, но не от истории выборов алгоритма. Это гарантирует
         корректность сравнения алгоритмов: один и тот же «бросок монеты» для всех.
         """
-        rng = np.random.default_rng([self.profile.seed, day_index])
+        rng = np.random.default_rng([self.profile.seed, run_seed, day_index])
         p = self.profile
 
         # Временной фактор: гауссово убывание от объективно лучшего времени
